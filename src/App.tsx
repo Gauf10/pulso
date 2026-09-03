@@ -35,13 +35,12 @@ function AppShell() {
     ensureUserDoc(user.uid)
     getUserSettings(user.uid).then(s => setAiEnabled(s.enabled))
     loadCalendars(accessToken)
-    loadTasks(today(), accessToken)
   }, [user, accessToken])
 
-  // Reload tasks when date changes
+  // Load tasks when calendars are ready or date changes
   useEffect(() => {
-    if (accessToken) loadTasks(selectedDate)
-  }, [selectedDate, selectedCalendars])
+    if (accessToken && selectedCalendars.size > 0) loadTasks(selectedDate)
+  }, [selectedDate, selectedCalendars, accessToken])
 
   const handleDateChange = (delta: number) => {
     setSelectedDate(addDays(selectedDate, delta))

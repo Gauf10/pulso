@@ -1,24 +1,29 @@
 import {
   collection, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  query, where, getDocs, writeBatch, Timestamp,
+  query, where, getDocs,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import type { Task, Subtask, RescheduleHistory, Calendar, GoogleAccount, AISettings } from '../types'
+import type { Task, Subtask, Calendar, GoogleAccount, AISettings, RescheduleHistory } from '../types'
+
+function ensureDb() {
+  if (!db) throw new Error('Firebase no está configurado')
+  return db
+}
 
 function userDoc(userId: string) {
-  return doc(db, 'users', userId)
+  return doc(ensureDb(), 'users', userId)
 }
 
 function tasksCol(userId: string) {
-  return collection(db, 'users', userId, 'tasks')
+  return collection(ensureDb(), 'users', userId, 'tasks')
 }
 
 function subtasksCol(userId: string, taskId: string) {
-  return collection(db, 'users', userId, 'tasks', taskId, 'subtasks')
+  return collection(ensureDb(), 'users', userId, 'tasks', taskId, 'subtasks')
 }
 
 function historyCol(userId: string, taskId: string) {
-  return collection(db, 'users', userId, 'tasks', taskId, 'rescheduleHistory')
+  return collection(ensureDb(), 'users', userId, 'tasks', taskId, 'rescheduleHistory')
 }
 
 // ── Tasks ──
@@ -26,11 +31,7 @@ function historyCol(userId: string, taskId: string) {
 export async function getTasksForDate(userId: string, date: string): Promise<Task[]> {
   const start = `${date}T00:00:00`
   const end = `${date}T23:59:59`
-  const q = query(
-    tasksCol(userId),
-    where('start', '>=', start),
-    where('start', '<=', end),
-  )
+  const q = query(tasksCol(userId), where('start', '>=', start), where('start', '<=', end))
   const snap = await getDocs(q)
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as Task))
 }
@@ -93,23 +94,23 @@ export async function getRescheduleHistory(userId: string, taskId: string): Prom
 // ── Calendars ──
 
 export async function getCalendars(userId: string): Promise<Calendar[]> {
-  const snap = await getDocs(collection(db, 'users', userId, 'calendars'))
+  const snap = await getDocs(collection(ensureDb(), 'users', userId, 'calendars'))
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as Calendar))
 }
 
 export async function saveCalendar(userId: string, calendar: Calendar) {
-  await setDoc(doc(db, 'users', userId, 'calendars', calendar.id), calendar, { merge: true })
+  await setDoc(doc(ensureDb(), 'users', userId, 'calendars', calendar.id), calendar, { merge: true })
 }
 
 // ── Google Accounts ──
 
 export async function getGoogleAccounts(userId: string): Promise<GoogleAccount[]> {
-  const snap = await getDocs(collection(db, 'users', userId, 'googleAccounts'))
+  const snap = await getDocs(collection(ensureDb(), 'users', userId, 'googleAccounts'))
   return snap.docs.map(d => ({ id: d.id, ...d.data() } as GoogleAccount))
 }
 
 export async function saveGoogleAccount(userId: string, account: GoogleAccount) {
-  await setDoc(doc(db, 'users', userId, 'googleAccounts', account.id), account, { merge: true })
+  await setDoc(doc(ensureDb(), 'users', userId, 'googleAccounts', account.id), account, { merge: true })
 }
 
 // ── User Settings ──

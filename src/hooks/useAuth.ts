@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { User } from 'firebase/auth'
 import { onAuthChange, loginWithGoogle, logout as fbLogout } from '../lib/auth'
+import { isConfigured } from '../lib/firebase'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
@@ -8,6 +9,10 @@ export function useAuth() {
   const [accessToken, setAccessToken] = useState<string>('')
 
   useEffect(() => {
+    if (!isConfigured) {
+      setLoading(false)
+      return
+    }
     const unsub = onAuthChange((u) => {
       setUser(u)
       setLoading(false)
@@ -26,5 +31,5 @@ export function useAuth() {
     setAccessToken('')
   }, [])
 
-  return { user, loading, login, logout, accessToken, setAccessToken }
+  return { user, loading, login, logout, accessToken, setAccessToken, configured: isConfigured }
 }

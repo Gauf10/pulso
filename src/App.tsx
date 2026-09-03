@@ -68,15 +68,6 @@ function AppShell() {
     setDetailTask(null)
   }
 
-  // Splash fade
-  useEffect(() => {
-    const el = document.getElementById('splash')
-    if (el) {
-      const t = setTimeout(() => { el.style.display = 'none' }, 1200)
-      return () => clearTimeout(t)
-    }
-  }, [])
-
   return (
     <div className="app-layout">
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
@@ -172,10 +163,44 @@ function AppShell() {
   )
 }
 
+function SetupScreen() {
+  return (
+    <div className="login-screen">
+      <div className="login-card">
+        <div className="login-logo">◉</div>
+        <h1>Pulso</h1>
+        <p className="login-subtitle">Tu agenda, llevada a la realidad</p>
+        <div style={{ marginTop: 24, textAlign: 'left', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+          <p style={{ marginBottom: 12 }}>Pulso necesita credenciales de Firebase para funcionar.</p>
+          <p style={{ marginBottom: 8 }}>Copiá <code style={{ background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: 4 }}>.env.example</code> a <code style={{ background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: 4 }}>.env</code> y completá:</p>
+          <ul style={{ paddingLeft: 20, margin: 0 }}>
+            <li>VITE_FIREBASE_API_KEY</li>
+            <li>VITE_FIREBASE_AUTH_DOMAIN</li>
+            <li>VITE_FIREBASE_PROJECT_ID</li>
+            <li>VITE_FIREBASE_STORAGE_BUCKET</li>
+            <li>VITE_FIREBASE_MESSAGING_SENDER_ID</li>
+            <li>VITE_FIREBASE_APP_ID</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
-  const { user, loading, login } = useAuth()
+  const { user, loading, login, configured } = useAuth()
+
+  useEffect(() => {
+    const el = document.getElementById('splash')
+    if (el) {
+      const t = setTimeout(() => { el.style.display = 'none' }, 1200)
+      return () => clearTimeout(t)
+    }
+  }, [])
 
   if (loading) return null
+
+  if (!configured) return <SetupScreen />
 
   if (!user) {
     return <LoginScreen onLogin={async () => { await login() }} />

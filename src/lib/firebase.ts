@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { initializeFirestore, persistentLocalCache, persistentSingleTabManager } from 'firebase/firestore'
+import { initializeApp, type FirebaseApp } from 'firebase/app'
+import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth'
+import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, type Firestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,18 +11,26 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-const app = initializeApp(firebaseConfig)
+const isConfigured = !!firebaseConfig.apiKey
 
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentSingleTabManager(undefined),
-  }),
-})
+let app: FirebaseApp | null = null
+let db: Firestore | null = null
+let auth: Auth | null = null
+let googleProvider: GoogleAuthProvider | null = null
+let authReady: Promise<void> = Promise.resolve()
 
-export const auth = getAuth(app)
-export const authReady = getAuth(app).authStateReady()
-export const googleProvider = new GoogleAuthProvider()
+if (isConfigured) {
+  app = initializeApp(firebaseConfig)
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentSingleTabManager(undefined),
+    }),
+  })
+  auth = getAuth(app)
+  authReady = auth.authStateReady()
+  googleProvider = new GoogleAuthProvider()
+  googleProvider.addScope('https://www.googleapis.com/auth/calendar')
+  googleProvider.addScope('https://www.googleapis.com/auth/calendar.events')
+}
 
-// Calendar scopes
-googleProvider.addScope('https://www.googleapis.com/auth/calendar')
-googleProvider.addScope('https://www.googleapis.com/auth/calendar.events')
+export { app, db, auth, authReady, googleProvider, isConfigured }

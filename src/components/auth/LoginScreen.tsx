@@ -24,7 +24,7 @@ export default function LoginScreen({ onLogin }: Props) {
   return (
     <div className="login-screen">
       <div className="login-card">
-        <div className="login-logo">◉</div>
+        <img src="/pulso-192.png" alt="Pulso" className="login-logo-img" />
         <h1>Pulso</h1>
         <p className="login-subtitle">Tu agenda, llevada a la realidad</p>
 

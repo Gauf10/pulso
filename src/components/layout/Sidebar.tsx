@@ -20,7 +20,7 @@ export default function Sidebar({ currentPage, onNavigate, onClose, onLogout, us
       <div className={`sidebar ${open ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <span className="sidebar-logo-icon">◉</span>
+            <img src="/pulso-192.png" alt="" className="sidebar-logo-img" />
             <span className="sidebar-title">Pulso</span>
           </div>
           <button className="sidebar-close" onClick={onClose}>✕</button>

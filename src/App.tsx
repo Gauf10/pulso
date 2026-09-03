@@ -19,7 +19,7 @@ type Page = 'today' | 'pending' | 'closure' | 'settings'
 function AppShell() {
   const { user, login, logout, accessToken, setAccessToken } = useAuth()
   const {
-    tasks, calendars, loading, selectedDate, selectedCalendars,
+    tasks, calendars, loading, error, selectedDate, selectedCalendars,
     setSelectedDate, loadCalendars, loadTasks, refresh,
     moveTask, updateTaskStatus, updateEstimatedDuration, toggleCalendar,
   } = useCalendar(user!, accessToken)
@@ -73,7 +73,7 @@ function AppShell() {
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
       <Sidebar
         currentPage={currentPage}
-        onNavigate={(page) => { setCurrentPage(page as Page); setSidebarOpen(false) }}
+        onNavigate={(page) => { setCurrentPage(page as Page); if (window.innerWidth <= 768) setSidebarOpen(false) }}
         onClose={() => setSidebarOpen(false)}
         onLogout={logout}
         userName={user?.displayName || user?.email || null}
@@ -105,6 +105,7 @@ function AppShell() {
               user={user!}
               selectedDate={selectedDate}
               loading={loading}
+              error={error}
               onDateChange={handleDateChange}
               onGoToday={handleGoToday}
               onRefresh={refresh}

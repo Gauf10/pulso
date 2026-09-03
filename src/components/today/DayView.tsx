@@ -11,6 +11,7 @@ interface Props {
   user: User
   selectedDate: string
   loading: boolean
+  error: string | null
   onDateChange: (delta: number) => void
   onGoToday: () => void
   onRefresh: () => void
@@ -20,14 +21,13 @@ interface Props {
 }
 
 export default function DayView({
-  tasks, user, selectedDate, loading,
+  tasks, user, selectedDate, loading, error,
   onDateChange, onGoToday, onRefresh,
   onStatusChange, onMove, onEstimatedDurationChange,
 }: Props) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [subtaskCounts, setSubtaskCounts] = useState<Record<string, { total: number; done: number }>>({})
 
-  // Load subtask counts
   useState(() => {
     tasks.forEach(async task => {
       const subtasks = await fs.getSubtasks(user.uid, task.id)
@@ -50,7 +50,6 @@ export default function DayView({
 
   return (
     <div className="day-view">
-      {/* Header */}
       <div className="day-header">
         <button className="btn btn-icon btn-ghost" onClick={() => onDateChange(-1)}>‹</button>
         <div className="day-header-center">
@@ -62,13 +61,19 @@ export default function DayView({
         <button className="btn btn-icon btn-ghost" onClick={() => onDateChange(1)}>›</button>
       </div>
 
-      {/* Events list */}
+      {error && (
+        <div className="day-error">
+          <p>{error}</p>
+          <p className="day-error-hint">Verificá que la Google Calendar API esté habilitada en Google Cloud Console.</p>
+        </div>
+      )}
+
       {loading ? (
         <div className="day-loading">
           <div className="day-loading-spinner" />
           <span>Cargando eventos...</span>
         </div>
-      ) : tasks.length === 0 ? (
+      ) : tasks.length === 0 && !error ? (
         <div className="day-empty">
           <p>No hay eventos para este día</p>
         </div>
@@ -87,7 +92,6 @@ export default function DayView({
         </div>
       )}
 
-      {/* Detail panel */}
       {selectedTask && (
         <EventDetail
           task={selectedTask}

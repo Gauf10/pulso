@@ -12,6 +12,7 @@ export function useCalendar(user: User, accessToken: string) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [calendars, setCalendars] = useState<Calendar[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState(() => today())
   const [selectedCalendars, setSelectedCalendars] = useState<Set<string>>(new Set())
   const tokenRef = useRef(accessToken)
@@ -34,12 +35,13 @@ export function useCalendar(user: User, accessToken: string) {
       }))
       setCalendars(userCalendars)
       setSelectedCalendars(new Set(userCalendars.map(c => c.googleCalendarId)))
-      // Persist
+      setError(null)
       for (const cal of userCalendars) {
         await fs.saveCalendar(user.uid, cal)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading calendars:', err)
+      setError(`No se pudieron cargar los calendarios: ${err.message || err}`)
     }
   }, [user])
 
@@ -83,8 +85,9 @@ export function useCalendar(user: User, accessToken: string) {
       }
 
       setTasks(newTasks.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()))
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading tasks:', err)
+      setError(`No se pudieron cargar los eventos: ${err.message || err}`)
     } finally {
       setLoading(false)
     }
@@ -143,7 +146,7 @@ export function useCalendar(user: User, accessToken: string) {
   }, [])
 
   return {
-    tasks, calendars, loading, selectedDate, selectedCalendars,
+    tasks, calendars, loading, error, selectedDate, selectedCalendars,
     setSelectedDate, loadCalendars, loadTasks, refresh,
     moveTask, updateTaskStatus, updateEstimatedDuration, toggleCalendar,
   }

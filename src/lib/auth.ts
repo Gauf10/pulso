@@ -17,6 +17,7 @@ export async function loginWithGoogle(): Promise<{ user: User; accessToken: stri
   const result = await signInWithPopup(auth, googleProvider)
   const credential = GoogleAuthProvider.credentialFromResult(result)
   const accessToken = credential?.accessToken || ''
+  console.log('[Pulso Auth] accessToken length:', accessToken.length, 'scopes:', credential?.signInMethod)
   return { user: result.user, accessToken }
 }
 

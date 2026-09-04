@@ -22,7 +22,6 @@ export interface GoogleCalendarListEntry {
 }
 
 async function gFetch(url: string, token: string, opts?: RequestInit) {
-  console.log('[Pulso gFetch] URL:', url, 'token length:', token?.length)
   const res = await fetch(url, {
     ...opts,
     headers: {
@@ -31,10 +30,8 @@ async function gFetch(url: string, token: string, opts?: RequestInit) {
       ...opts?.headers,
     },
   })
-  console.log('[Pulso gFetch] Response:', res.status, res.statusText)
   if (!res.ok) {
     const body = await res.text()
-    console.error('[Pulso gFetch] Error body:', body)
     throw new Error(`Google API ${res.status}: ${body}`)
   }
   return res.json()

@@ -24,9 +24,7 @@ export function useCalendar(user: User, accessToken: string) {
   const loadCalendars = useCallback(async (token: string) => {
     if (!user || !token) return
     try {
-      console.log('[Pulso] Loading calendars...')
       const gcalendars = await listCalendars(token)
-      console.log('[Pulso] Calendars from Google:', gcalendars.length)
       const userCalendars: Calendar[] = gcalendars.map(gc => ({
         id: gc.id,
         googleAccountId: user.uid,
@@ -42,7 +40,7 @@ export function useCalendar(user: User, accessToken: string) {
         await fs.saveCalendar(user.uid, cal)
       }
     } catch (err: any) {
-      console.error('[Pulso] Error loading calendars:', err)
+      console.error('Error loading calendars:', err)
       setError(`No se pudieron cargar los calendarios: ${err.message || err}`)
     }
   }, [user])
@@ -53,7 +51,6 @@ export function useCalendar(user: User, accessToken: string) {
     setLoading(true)
     setError(null)
     try {
-      console.log('[Pulso] Loading tasks for', date, 'calendars:', selectedCalendars.size)
       const timeMin = `${date}T00:00:00-05:00`
       const timeMax = `${date}T23:59:59-05:00`
 
@@ -61,10 +58,9 @@ export function useCalendar(user: User, accessToken: string) {
       for (const calId of selectedCalendars) {
         try {
           const events = await getEvents(t, calId, timeMin, timeMax)
-          console.log('[Pulso] Events from', calId, ':', events.length)
           allEvents.push(...events)
         } catch (err: any) {
-          console.warn(`[Pulso] Error fetching calendar ${calId}:`, err.message || err)
+          console.warn(`Error fetching calendar ${calId}:`, err.message || err)
         }
       }
 

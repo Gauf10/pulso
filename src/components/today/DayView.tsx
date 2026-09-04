@@ -100,7 +100,6 @@ export default function DayView({
           onStatusChange={(status, actual) => {
             onStatusChange(selectedTask.id, status, actual)
             setSelectedTask(null)
-            onRefresh()
           }}
           onMove={(taskId) => {
             onMove(taskId)

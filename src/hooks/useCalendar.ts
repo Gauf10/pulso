@@ -64,19 +64,20 @@ export function useCalendar(user: User, accessToken: string) {
         }
       }
 
-      // Convert to tasks and deduplicate by googleEventId
+      // Batch-fetch existing tasks for this date range from Firestore
+      const existingTasks = await fs.getTasksForDate(user.uid, date)
+      const existingByEventId = new Map(existingTasks.map(t => [t.googleEventId, t]))
+
       const seen = new Set<string>()
       const newTasks: Task[] = []
       for (const event of allEvents) {
         if (seen.has(event.id)) continue
         seen.add(event.id)
         const taskData = eventToTask(event, user.uid, user.uid)
-        // Try to preserve existing Pulso data
-        const existing = await findTaskByGoogleEvent(user.uid, event.id)
+        const existing = existingByEventId.get(event.id)
         if (existing) {
           newTasks.push({ ...taskData, id: existing.id, status: existing.status, estimatedDurationMinutes: existing.estimatedDurationMinutes, actualDurationMinutes: existing.actualDurationMinutes, rescheduleCount: existing.rescheduleCount })
         } else {
-          // Suggest duration
           const calDuration = taskData.estimatedDurationMinutes
           taskData.estimatedDurationMinutes = suggestDuration(taskData.title, taskData.description, calDuration)
           const id = await fs.saveTask(user.uid, taskData)

@@ -1,19 +1,19 @@
 import { useState } from 'react'
 import type { Task } from '../../types'
 import type { User } from 'firebase/auth'
-import { addDays, formatDate, today } from '../../services/eventMapper'
+import { addDays, formatTime, today } from '../../services/eventMapper'
 import { useSubtasks } from '../../hooks/useSubtasks'
 
 interface Props {
   tasks: Task[]
   user: User
   onMoveTask: (taskId: string, newStart: string, newEnd: string) => Promise<void>
+  onStatusChange: (taskId: string, status: Task['status']) => void
   onRefresh: () => void
 }
 
-export default function DayClosure({ tasks, user, onMoveTask, onRefresh }: Props) {
+export default function DayClosure({ tasks, user, onMoveTask, onStatusChange, onRefresh }: Props) {
   const pending = tasks.filter(t => t.status !== 'done')
-  const [moving, setMoving] = useState<string | null>(null)
   const tomorrow = addDays(today(), 1)
 
   const handleMoveTomorrow = async (task: Task) => {
@@ -46,6 +46,7 @@ export default function DayClosure({ tasks, user, onMoveTask, onRefresh }: Props
             task={task}
             user={user}
             onMoveTomorrow={() => handleMoveTomorrow(task)}
+            onDone={() => onStatusChange(task.id, 'done')}
           />
         ))}
       </div>
@@ -53,15 +54,18 @@ export default function DayClosure({ tasks, user, onMoveTask, onRefresh }: Props
   )
 }
 
-function ClosureCard({ task, user, onMoveTomorrow }: { task: Task; user: User; onMoveTomorrow: () => void }) {
+function ClosureCard({ task, user, onMoveTomorrow, onDone }: { task: Task; user: User; onMoveTomorrow: () => void; onDone: () => void }) {
   const { subtasks } = useSubtasks(user, task.id)
-  const [showOptions, setShowOptions] = useState(false)
+
+  const taskDate = new Date(task.start)
+  const dayLabel = taskDate.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })
+  const timeLabel = formatTime(task.start)
 
   return (
     <div className="closure-card">
       <div className="closure-card-header">
         <span className="closure-card-title">{task.title}</span>
-        <span className="closure-card-duration">{task.estimatedDurationMinutes} min</span>
+        <span className="closure-card-time">{dayLabel} {timeLabel}</span>
       </div>
 
       {subtasks.length > 0 && (
@@ -73,17 +77,11 @@ function ClosureCard({ task, user, onMoveTomorrow }: { task: Task; user: User; o
       )}
 
       <div className="closure-card-actions">
-        <button className="btn btn-primary btn-sm" onClick={onMoveTomorrow}>
+        <button className="btn btn-primary btn-sm" onClick={onDone}>
+          ☑ Hecho
+        </button>
+        <button className="btn btn-ghost btn-sm" onClick={onMoveTomorrow}>
           → Mañana
-        </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => setShowOptions(!showOptions)}>
-          Elegir fecha
-        </button>
-        <button className="btn btn-ghost btn-sm">
-          Dividir
-        </button>
-        <button className="btn btn-ghost btn-sm btn-danger">
-          Descartar
         </button>
       </div>
 

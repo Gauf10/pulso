@@ -108,7 +108,7 @@ function AppShell() {
               onDateChange={handleDateChange}
               onGoToday={handleGoToday}
               onRefresh={refresh}
-              onStatusChange={(taskId, status, actual) => updateTaskStatus(taskId, status, actual).then(refresh)}
+              onStatusChange={(taskId, status, actual) => updateTaskStatus(taskId, status, actual)}
               onMove={(taskId) => {
                 const task = tasks.find(t => t.id === taskId)
                 if (task) setDetailTask(task)
@@ -126,6 +126,7 @@ function AppShell() {
               tasks={tasks}
               user={user!}
               onMoveTask={moveTask}
+              onStatusChange={(taskId, status) => updateTaskStatus(taskId, status)}
               onRefresh={refresh}
             />
           )}

@@ -285,7 +285,7 @@ body {
 }
 .closure-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .closure-card-title { font-size: 15px; font-weight: 600; }
-.closure-card-duration { font-size: 13px; color: var(--text-muted); }
+.closure-card-time { font-size: 13px; color: var(--text-muted); }
 .closure-card-subtasks { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
 .closure-card-subtask { font-size: 13px; color: var(--text-secondary); }
 .closure-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }

@@ -6,7 +6,7 @@ import { isConfigured } from '../lib/firebase'
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [accessToken, setAccessToken] = useState<string>('')
+  const [accessToken, setAccessToken] = useState<string>(() => localStorage.getItem('pulso_token') || '')
 
   useEffect(() => {
     if (!isConfigured) {
@@ -20,16 +20,22 @@ export function useAuth() {
     return unsub
   }, [])
 
+  const handleSetToken = useCallback((token: string) => {
+    if (token) localStorage.setItem('pulso_token', token)
+    else localStorage.removeItem('pulso_token')
+    setAccessToken(token)
+  }, [])
+
   const login = useCallback(async () => {
     const result = await loginWithGoogle()
-    setAccessToken(result.accessToken)
+    handleSetToken(result.accessToken)
     return result
-  }, [])
+  }, [handleSetToken])
 
   const logout = useCallback(async () => {
     await fbLogout()
-    setAccessToken('')
-  }, [])
+    handleSetToken('')
+  }, [handleSetToken])
 
-  return { user, loading, login, logout, accessToken, setAccessToken, configured: isConfigured }
+  return { user, loading, login, logout, accessToken, setAccessToken: handleSetToken, configured: isConfigured }
 }

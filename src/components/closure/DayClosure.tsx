@@ -40,14 +40,7 @@ export default function DayClosure({ tasks, user, onMoveTask, onStatusChange, on
   }
 
   const handleSplit = (task: Task) => {
-    const half = Math.max(15, Math.round(task.estimatedDurationMinutes / 2))
-    const firstEnd = new Date(new Date(task.start).getTime() + half * 60000).toISOString()
-    const secondStart = firstEnd
-    const secondEnd = task.end
-    onToast(`Dividido en dos: ${half} min + ${task.estimatedDurationMinutes - half} min`, 'info')
-    onMoveTask(task.id, task.start, firstEnd).then(() => {
-      onMoveTask(task.id, secondStart, secondEnd)
-    }).then(onRefresh)
+    onToast('Próximamente: dividir tareas', 'info')
   }
 
   if (pending.length === 0) {

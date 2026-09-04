@@ -3,6 +3,7 @@ import './index.css'
 import { useAuth } from './hooks/useAuth'
 import { useCalendar } from './hooks/useCalendar'
 import LoginScreen from './components/auth/LoginScreen'
+import { useToast, ToastContainer } from './components/ui/Toast'
 import Sidebar from './components/layout/Sidebar'
 import DayView from './components/today/DayView'
 import PendingPage from './components/pending/PendingPage'
@@ -23,6 +24,7 @@ function AppShell() {
     setSelectedDate, loadCalendars, loadTasks, refresh,
     moveTask, updateTaskStatus, updateEstimatedDuration, toggleCalendar,
   } = useCalendar(user!, accessToken)
+  const { toasts, show: showToast, dismiss } = useToast()
 
   const [currentPage, setCurrentPage] = useState<Page>('today')
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768)
@@ -108,7 +110,12 @@ function AppShell() {
               onDateChange={handleDateChange}
               onGoToday={handleGoToday}
               onRefresh={refresh}
-              onStatusChange={(taskId, status, actual) => updateTaskStatus(taskId, status, actual)}
+              onStatusChange={(taskId, status, actual) => {
+                updateTaskStatus(taskId, status, actual)
+                if (status === 'done') showToast('Marcado como hecho', 'success')
+                else if (status === 'in_progress') showToast('En progreso', 'info')
+                else showToast('Pendiente', 'info')
+              }}
               onMove={(taskId) => {
                 const task = tasks.find(t => t.id === taskId)
                 if (task) setDetailTask(task)
@@ -126,8 +133,12 @@ function AppShell() {
               tasks={tasks}
               user={user!}
               onMoveTask={moveTask}
-              onStatusChange={(taskId, status) => updateTaskStatus(taskId, status)}
+              onStatusChange={(taskId, status) => {
+                updateTaskStatus(taskId, status)
+                if (status === 'done') showToast('Marcado como hecho', 'success')
+              }}
               onRefresh={refresh}
+              onToast={showToast}
             />
           )}
 
@@ -155,11 +166,14 @@ function AppShell() {
               refresh()
               setDetailTask(null)
             })
+            if (status === 'done') showToast('Marcado como hecho', 'success')
           }}
           onMove={handleMoveFromDetail}
           onEstimatedDurationChange={updateEstimatedDuration}
         />
       )}
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }

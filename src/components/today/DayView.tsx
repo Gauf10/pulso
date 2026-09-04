@@ -17,13 +17,14 @@ interface Props {
   onRefresh: () => void
   onStatusChange: (taskId: string, status: Task['status'], actualDuration?: number) => void
   onMove: (taskId: string) => void
+  onMoveTomorrow: (taskId: string) => void
   onEstimatedDurationChange: (taskId: string, minutes: number) => void
 }
 
 export default function DayView({
   tasks, user, selectedDate, loading, error,
   onDateChange, onGoToday, onRefresh,
-  onStatusChange, onMove, onEstimatedDurationChange,
+  onStatusChange, onMove, onMoveTomorrow, onEstimatedDurationChange,
 }: Props) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [subtaskCounts, setSubtaskCounts] = useState<Record<string, { total: number; done: number }>>({})
@@ -87,6 +88,7 @@ export default function DayView({
               subtaskDone={subtaskCounts[task.id]?.done}
               onClick={() => setSelectedTask(task)}
               onStatusChange={(status) => onStatusChange(task.id, status)}
+              onMove={() => onMoveTomorrow(task.id)}
             />
           ))}
         </div>
@@ -101,8 +103,8 @@ export default function DayView({
             onStatusChange(selectedTask.id, status, actual)
             setSelectedTask(null)
           }}
-          onMove={(taskId) => {
-            onMove(taskId)
+          onMove={() => {
+            onMoveTomorrow(selectedTask.id)
             setSelectedTask(null)
           }}
           onEstimatedDurationChange={onEstimatedDurationChange}

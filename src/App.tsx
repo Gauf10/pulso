@@ -69,6 +69,16 @@ function AppShell() {
     setDetailTask(null)
   }
 
+  const handleMoveTomorrow = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId)
+    if (!task) return
+    const tomorrow = addDays(today(), 1)
+    const newStart = task.start.replace(/^\d{4}-\d{2}-\d{2}/, tomorrow)
+    const newEnd = task.end.replace(/^\d{4}-\d{2}-\d{2}/, tomorrow)
+    showToast('Movido a mañana', 'success')
+    moveTask(taskId, newStart, newEnd).then(() => refresh())
+  }
+
   return (
     <div className="app-layout">
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
@@ -120,6 +130,7 @@ function AppShell() {
                 const task = tasks.find(t => t.id === taskId)
                 if (task) setDetailTask(task)
               }}
+              onMoveTomorrow={handleMoveTomorrow}
               onEstimatedDurationChange={updateEstimatedDuration}
             />
           )}

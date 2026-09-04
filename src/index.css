@@ -175,6 +175,7 @@ body {
 .event-calendar { color: var(--text-secondary); }
 .event-duration { color: var(--text-muted); }
 .event-subtasks-preview { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.event-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .event-reschedule-badge {
   font-size: 11px; color: var(--warning); margin-top: 4px;
   background: rgba(243, 156, 18, 0.1); padding: 2px 8px;
@@ -187,6 +188,14 @@ body {
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s; flex-shrink: 0;
 }
+.event-action-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: transparent;
+  color: var(--text-muted); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.event-action-btn:hover { border-color: var(--accent); color: var(--accent); }
 .event-status-btn:hover { border-color: var(--accent); color: var(--accent); }
 .event-status-btn.done { background: var(--success); border-color: var(--success); color: #fff; }
 

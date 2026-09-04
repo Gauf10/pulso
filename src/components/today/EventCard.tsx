@@ -8,9 +8,10 @@ interface Props {
   subtaskDone?: number
   onClick: () => void
   onStatusChange: (status: Task['status']) => void
+  onMove: () => void
 }
 
-export default function EventCard({ task, subtaskCount, subtaskDone, onClick, onStatusChange }: Props) {
+export default function EventCard({ task, subtaskCount, subtaskDone, onClick, onStatusChange, onMove }: Props) {
   const statusIcon = task.status === 'done' ? '☑' : task.status === 'in_progress' ? '◐' : '☐'
   const statusClass = task.status === 'done' ? 'event-done' : task.status === 'in_progress' ? 'event-progress' : ''
 
@@ -41,6 +42,11 @@ export default function EventCard({ task, subtaskCount, subtaskDone, onClick, on
       </div>
 
       <div className="event-actions" onClick={e => e.stopPropagation()}>
+        {task.status !== 'done' && (
+          <button className="event-action-btn" title="Mover a mañana" onClick={onMove}>
+            →
+          </button>
+        )}
         <button
           className={`event-status-btn ${task.status === 'done' ? 'done' : ''}`}
           onClick={() => onStatusChange(task.status === 'done' ? 'pending' : 'done')}

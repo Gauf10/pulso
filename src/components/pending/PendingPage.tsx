@@ -54,6 +54,7 @@ export default function PendingPage({ user, onOpenTask }: Props) {
               task={task}
               onClick={() => onOpenTask(task)}
               onStatusChange={() => {}}
+              onMove={() => {}}
             />
           ))}
         </div>

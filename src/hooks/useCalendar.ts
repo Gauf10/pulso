@@ -64,13 +64,16 @@ export function useCalendar(user: User, accessToken: string) {
         }
       }
 
+      // Filter out work location events (e.g. "Lugar de trabajo: Casa")
+      const filteredEvents = allEvents.filter(e => !e.summary?.startsWith('Lugar de trabajo:'))
+
       // Batch-fetch existing tasks for this date range from Firestore
       const existingTasks = await fs.getTasksForDate(user.uid, date)
       const existingByEventId = new Map(existingTasks.map(t => [t.googleEventId, t]))
 
       const seen = new Set<string>()
       const newTasks: Task[] = []
-      for (const event of allEvents) {
+      for (const event of filteredEvents) {
         if (seen.has(event.id)) continue
         seen.add(event.id)
         const taskData = eventToTask(event, user.uid, user.uid)

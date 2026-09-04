@@ -342,10 +342,11 @@ body {
   font-size: 14px; pointer-events: all;
   animation: toastIn 0.25s ease;
   max-width: 420px; width: max-content;
+  backdrop-filter: blur(8px);
 }
-.toast-info { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); }
-.toast-success { background: rgba(125,223,100,0.15); border: 1px solid var(--accent); color: var(--accent); }
-.toast-error { background: rgba(224,80,80,0.15); border: 1px solid var(--error); color: var(--error); }
+.toast-info { background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); }
+.toast-success { background: var(--bg-primary); border: 1px solid var(--accent); color: var(--accent); }
+.toast-error { background: var(--bg-primary); border: 1px solid var(--error); color: var(--error); }
 .toast-close {
   background: none; border: none; color: inherit; cursor: pointer;
   font-size: 18px; line-height: 1; opacity: 0.6; padding: 0 2px;

@@ -64,8 +64,15 @@ export function useCalendar(user: User, accessToken: string) {
         }
       }
 
-      // Filter out work location events (e.g. "Lugar de trabajo: Casa")
-      const filteredEvents = allEvents.filter(e => !e.summary?.startsWith('Lugar de trabajo:'))
+      // Filter out work location events and all-day events from other days
+      const filteredEvents = allEvents.filter(e => {
+        if (e.summary?.startsWith('Lugar de trabajo:')) return false
+        // All-day events (date only, no dateTime) must match the selected date
+        if (e.start.date && !e.start.dateTime) {
+          return e.start.date === date
+        }
+        return true
+      })
 
       // Batch-fetch existing tasks for this date range from Firestore
       const existingTasks = await fs.getTasksForDate(user.uid, date)

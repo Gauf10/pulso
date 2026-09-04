@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth'
-import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, type Firestore } from 'firebase/firestore'
+import { getFirestore, type Firestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,11 +21,7 @@ let authReady: Promise<void> = Promise.resolve()
 
 if (isConfigured) {
   app = initializeApp(firebaseConfig)
-  db = initializeFirestore(app, {
-    localCache: persistentLocalCache({
-      tabManager: persistentSingleTabManager(undefined),
-    }),
-  })
+  db = getFirestore(app)
   auth = getAuth(app)
   authReady = auth.authStateReady()
   googleProvider = new GoogleAuthProvider()
